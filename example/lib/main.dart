@@ -1,10 +1,19 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:io';
 
 import 'package:flutter/services.dart';
 import 'package:flutter_user_certificates_android/flutter_user_certificates_android.dart';
 
-void main() {
+final _flutterUserCertificatesAndroidPlugin = FlutterUserCertificatesAndroid();
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Extend the default security context to trust Android user certificates.
+  // This is a workaround for <https://github.com/dart-lang/sdk/issues/50435>.
+  await _flutterUserCertificatesAndroidPlugin.trustAndroidUserCertificates(SecurityContext.defaultContext);
+
   runApp(const MyApp());
 }
 
@@ -18,8 +27,6 @@ class MyApp extends StatefulWidget {
 class _MyAppState extends State<MyApp> {
   Map<String, Uint8List> _certs = {};
   String? error;
-  final _flutterUserCertificatesAndroidPlugin =
-      FlutterUserCertificatesAndroid();
 
   @override
   void initState() {
